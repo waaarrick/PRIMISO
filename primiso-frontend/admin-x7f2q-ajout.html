@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin-style.css">
+  <title>Ajout d'un chantier</title>
+</head>
+<body>
+
+  <div class="admin-topbar">
+    <h1>Ajout d'un chantier</h1>
+  </div>
+
+  <div class="admin-wrapper">
+    <form id="formAjout" class="admin-form-layout">
+
+      <div class="admin-form-fields">
+        <input type="text" id="titre" class="admin-input" placeholder="Titre" required>
+        <input type="number" id="annee" class="admin-input" placeholder="Année (ex: 2023)" min="2000" max="2030" required>
+        <textarea id="description" class="admin-textarea" placeholder="Description courte" required></textarea>
+        <textarea id="prestations" class="admin-textarea admin-textarea-large" placeholder="Prestations (une par ligne)" required></textarea>
+      </div>
+
+      <div class="admin-photo-panel">
+        <button type="button" class="admin-photo-drop" onclick="document.getElementById('inputPhotos').click()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+          </svg>
+        </button>
+        <div class="admin-photo-label">Ajout photo</div>
+        <input type="file" id="inputPhotos" accept="image/*" multiple hidden>
+        <div class="admin-photo-previews" id="previews"></div>
+      </div>
+
+      <div class="admin-form-buttons" style="width:100%;">
+        <button type="button" class="btn-admin btn-danger-admin" onclick="window.location.href='admin-x7f2q-liste.html'">Annuler</button>
+        <button type="submit" class="btn-admin btn-primary-admin">Ajouter</button>
+      </div>
+
+      <p id="message" class="admin-message"></p>
+    </form>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:3000';
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      window.location.href = 'admin-x7f2q-login.html';
+    }
+
+    // Stocke les fichiers sélectionnés (on peut en ajouter plusieurs fois avant validation)
+    let fichiersSelectionnes = [];
+
+    const inputPhotos = document.getElementById('inputPhotos');
+    const previews = document.getElementById('previews');
+
+    inputPhotos.addEventListener('change', (e) => {
+      fichiersSelectionnes = fichiersSelectionnes.concat(Array.from(e.target.files));
+      afficherPreviews();
+      inputPhotos.value = ''; // permet de resélectionner le même fichier si besoin
+    });
+
+    function afficherPreviews() {
+      previews.innerHTML = '';
+      fichiersSelectionnes.forEach((fichier, index) => {
+        const url = URL.createObjectURL(fichier);
+        const wrap = document.createElement('div');
+        wrap.className = 'admin-photo-thumb-wrap';
+        wrap.innerHTML = `
+          <img src="${url}">
+          <button type="button" class="admin-photo-remove" onclick="retirerPhoto(${index})">&times;</button>
+        `;
+        previews.appendChild(wrap);
+      });
+    }
+
+    function retirerPhoto(index) {
+      fichiersSelectionnes.splice(index, 1);
+      afficherPreviews();
+    }
+
+    document.getElementById('formAjout').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const message = document.getElementById('message');
+      message.textContent = '';
+      message.className = 'admin-message';
+
+      const donnees = new FormData();
+      donnees.append('titre', document.getElementById('titre').value);
+      donnees.append('annee', document.getElementById('annee').value);
+      donnees.append('description', document.getElementById('description').value);
+      donnees.append('prestations', document.getElementById('prestations').value);
+      fichiersSelectionnes.forEach((fichier) => donnees.append('photos', fichier));
+
+      try {
+        const reponse = await fetch(`${API_BASE}/chantiers`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: donnees,
+        });
+
+        if (!reponse.ok) {
+          const erreur = await reponse.json().catch(() => ({}));
+          throw new Error(erreur.erreur || 'Erreur lors de l\'ajout');
+        }
+
+        window.location.href = 'admin-x7f2q-liste.html';
+      } catch (erreur) {
+        message.textContent = erreur.message;
+        message.classList.add('erreur');
+      }
+    });
+  </script>
+</body>
+</html>

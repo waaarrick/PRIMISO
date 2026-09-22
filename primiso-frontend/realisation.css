@@ -1,0 +1,120 @@
+:root {
+  --primary: #003B5C;
+  --space-md: 3rem;
+  --space-lg: 6rem;
+  --space-xl: 9rem;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+}
+.navbar-nav .nav-link {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700; 
+    font-size: 16px;
+    color: black;
+}
+@media(max-width: 991px){
+    .sidebar{
+        backdrop-filter: blur(10px);
+    }
+}
+.img-thumbnail {
+    border: none;
+    padding: 0;
+    border-radius: 0;
+}
+
+.btn-contact {
+  background-color: var(--primary);
+  color: #fff;
+  text-decoration: none;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  padding: 12px 28px;
+  border-radius: 50rem;
+  margin-top: 4px;
+  display: inline-block;
+  box-shadow: 0 6px 20px rgba(0, 59, 92, 0.3);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-contact:hover {
+    transform: scale(1.05);
+    background-color: #005080;
+    color: #fff;
+}
+
+/* Footer */
+.container1{
+    background-color: #005080;
+    width: 100%;
+    padding: var(--space-md) 60px;
+    margin: 0;
+    margin-top: var(--space-xl);
+}
+
+.footer-contact h3 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+  color: #fff;
+  margin: 0 0 1.5rem 0;
+}
+
+.footer-contact p {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 300;
+  font-size: 15px;
+  line-height: 1.8;
+  color: #fff;
+  margin: 0;
+}
+
+.footer-socials {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 12px;
+}
+
+.footer-socials img {
+  width: 40px;
+  height: 40px;
+}
+
+.footer-copy {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 300;
+  font-size: 13px;
+  color: #fff;
+  text-align: center;
+  margin-top: var(--space-lg);
+}
+
+/* ===== Footer map (ajouté) ===== */
+.footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.footer-map {
+  width: 320px;
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+@media (max-width: 700px) {
+  .footer-row {
+    flex-direction: column;
+  }
+  .footer-map {
+    width: 100%;
+  }
+}

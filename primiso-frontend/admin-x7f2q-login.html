@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Connexion Admin</title>
+</head>
+<body>
+  <h1>Connexion</h1>
+  <form id="loginForm">
+    <input type="email" id="email" placeholder="Email" required><br>
+    <input type="password" id="motDePasse" placeholder="Mot de passe" required><br>
+    <button type="submit">Se connecter</button>
+  </form>
+  <p id="erreur" style="color: red;"></p>
+
+  <script>
+    // Récupère le formulaire pour intercepter sa soumission
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault(); // Empêche le rechargement de page par défaut
+
+      const email = document.getElementById('email').value;
+      const motDePasse = document.getElementById('motDePasse').value;
+
+      // Envoie les identifiants à l'API
+      const reponse = await fetch('http://localhost:3000/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, motDePasse }),
+      });
+
+      const donnees = await reponse.json();
+
+      if (reponse.ok) {
+        // Stocke le token dans le navigateur (localStorage), pour l'utiliser plus tard
+        localStorage.setItem('token', donnees.token);
+        // Redirige vers la liste des chantiers
+        window.location.href = 'admin-x7f2q-liste.html';
+      } else {
+        document.getElementById('erreur').textContent = donnees.erreur;
+      }
+    });
+  </script>
+</body>
+</html>

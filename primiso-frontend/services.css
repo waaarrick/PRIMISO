@@ -1,0 +1,277 @@
+:root {
+  --primary: #003B5C;
+  --accent: #FF6B35;
+  --text-dark: #1A1A1A;
+  --text-muted: #555;
+
+  --space-sm: 1.5rem;
+  --space-md: 3rem;
+  --space-lg: 6rem;
+  --space-xl: 9rem;
+
+  --fs-hero: 44px;
+  --fs-h1: 36px;
+  --fs-h2: 28px;
+  --fs-lead: 20px;
+  --fs-body: 15px;
+  --fs-small: 13px;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  color: var(--text-dark);
+}
+
+/* ===== Navbar ===== */
+.navbar-nav .nav-link {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: black;
+}
+
+@media (max-width: 991px) {
+  .sidebar {
+    backdrop-filter: blur(10px);
+  }
+}
+
+.img-thumbnail {
+  border: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+.btn-contact {
+  background-color: var(--primary);
+  color: #fff;
+  text-decoration: none;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  padding: 12px 28px;
+  border-radius: 50rem;
+  margin-top: 4px;
+  display: inline-block;
+  box-shadow: 0 6px 20px rgba(0, 59, 92, 0.3);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-contact:hover {
+  transform: scale(1.05);
+  background-color: #005080;
+  color: #fff;
+}
+
+/* ===== Sections génériques (échelle d'espacement unifiée) ===== */
+.section {
+  margin-top: var(--space-xl);
+}
+
+.section-tight {
+  margin-top: var(--space-lg);
+}
+
+.section-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  font-size: var(--fs-h1);
+  margin: 0;
+}
+
+/* ===== Hero ===== */
+.hero {
+  height: 40rem;
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url(./images/hero.png) center/cover no-repeat;
+  margin-top: 5rem;
+  display: flex;
+  align-items: center;
+}
+
+.hero-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  font-size: var(--fs-hero);
+  color: #fff;
+  line-height: 1.2;
+  margin: 0;
+}
+
+/* ===== Intro + grille services ===== */
+.intro-text {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  font-size: var(--fs-lead);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md) var(--space-sm);
+}
+
+.service-item {
+  text-align: center;
+}
+
+.service-item img {
+  margin-bottom: 1rem;
+}
+
+.service-item p {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+  font-size: var(--fs-body);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* ===== Bandeau Qualibat ===== */
+.hero2 {
+  width: 100%;
+}
+
+.hero2-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ===== Galerie "Nos locaux" ===== */
+.gallery-wrapper {
+  max-width: 800px;
+  margin-top: var(--space-md);
+}
+
+.gallery-locaux {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.gallery-main-img {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  display: block;
+}
+
+.gallery-thumbs {
+  display: flex;
+  gap: 10px;
+  margin-top: 1rem;
+}
+
+.gallery-thumb {
+  width: 70px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.gallery-thumb:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+/* ===== Footer ===== */
+.container1 {
+  background-color: #005080;
+  width: 100%;
+  padding: var(--space-md) 60px;
+  margin: 0;
+  margin-top: var(--space-xl);
+}
+
+.footer-contact h3 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: var(--fs-h2);
+  color: #fff;
+  margin: 0 0 1.5rem 0;
+}
+
+.footer-contact p {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 300;
+  font-size: var(--fs-body);
+  line-height: 1.8;
+  color: #fff;
+  margin: 0;
+}
+
+.footer-socials {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 12px;
+}
+
+.footer-socials img {
+  width: 40px;
+  height: 40px;
+}
+
+.footer-copy {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 300;
+  font-size: var(--fs-small);
+  color: #fff;
+  text-align: center;
+  margin-top: var(--space-lg);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  :root {
+    --fs-hero: 32px;
+    --fs-h1: 28px;
+    --fs-lead: 18px;
+    --space-xl: 5rem;
+    --space-lg: 3.5rem;
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-sm);
+  }
+
+  .container1 {
+    padding: var(--space-md) 24px;
+  }
+}
+
+/* ===== Footer map (ajouté) ===== */
+.footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.footer-map {
+  width: 320px;
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+@media (max-width: 700px) {
+  .footer-row {
+    flex-direction: column;
+  }
+  .footer-map {
+    width: 100%;
+  }
+}

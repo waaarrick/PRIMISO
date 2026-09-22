@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin-style.css">
+  <title>Admin - Chantiers</title>
+</head>
+<body>
+
+  <div class="admin-topbar">
+    <h1>Bonjour Admin</h1>
+    <a href="admin-x7f2q-ajout.html" class="btn-admin btn-accent">+ ajouter un chantier</a>
+  </div>
+
+  <div class="admin-wrapper">
+    <div class="admin-table-card">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Photo</th>
+            <th>Titre</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="liste">
+          <tr>
+            <td colspan="3" class="admin-empty-state">Chargement des chantiers...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:3000';
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      window.location.href = 'admin-x7f2q-login.html';
+    }
+
+    async function chargerChantiers() {
+      const corps = document.getElementById('liste');
+
+      try {
+        const reponse = await fetch(`${API_BASE}/chantiers`);
+        const chantiers = await reponse.json();
+
+        if (!chantiers.length) {
+          corps.innerHTML = `<tr><td colspan="3" class="admin-empty-state">Aucun chantier pour le moment.</td></tr>`;
+          return;
+        }
+
+        corps.innerHTML = '';
+
+        for (const chantier of chantiers) {
+          const detailReponse = await fetch(`${API_BASE}/chantiers/${chantier.id}`);
+          const detail = await detailReponse.json();
+
+          const photoUrl = detail.photos && detail.photos.length > 0
+            ? `${API_BASE}${detail.photos[0].chemin}`
+            : '';
+
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${photoUrl ? `<img src="${photoUrl}" class="admin-thumb">` : ''}</td>
+            <td>${chantier.titre}</td>
+            <td>
+              <div class="admin-actions-cell">
+                <button class="btn-admin btn-primary-admin" onclick="window.location.href='admin-x7f2q-modifier.html?id=${chantier.id}'">modifier</button>
+                <button class="btn-icon" title="Supprimer" onclick="supprimerChantier(${chantier.id})">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                    <path d="M10 11v6"></path>
+                    <path d="M14 11v6"></path>
+                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          `;
+          corps.appendChild(tr);
+        }
+      } catch (erreur) {
+        corps.innerHTML = `<tr><td colspan="3" class="admin-empty-state">Erreur de chargement.</td></tr>`;
+        console.error(erreur);
+      }
+    }
+
+    async function supprimerChantier(id) {
+      if (!confirm('Es-tu sûr de vouloir supprimer ce chantier ?')) return;
+
+      await fetch(`${API_BASE}/chantiers/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      chargerChantiers();
+    }
+
+    chargerChantiers();
+  </script>
+</body>
+</html>
