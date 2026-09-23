@@ -22,7 +22,7 @@
       const motDePasse = document.getElementById('motDePasse').value;
 
       // Envoie les identifiants à l'API
-      const reponse = await fetch('http://localhost:3000/auth/login', {
+      const reponse = await fetch('https://primiso.onrender.com/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, motDePasse }),
