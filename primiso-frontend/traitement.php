@@ -1,4 +1,8 @@
 <?php
+header("Access-Control-Allow-Origin: https://dazzling-dango-de3d00.netlify.app");
+header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Headers: Content-Type");
+
 // Inclure PHPMailer
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
