@@ -28,6 +28,9 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+// Multer sans stockage de fichier, juste pour parser les FormData sans photo (ex: formulaire de contact)
+const uploadSansFichier = multer();
+
 app.get('/', (req, res) => {
   res.send('API PRIMISO en ligne');
 });
@@ -137,7 +140,7 @@ app.delete('/photos/:id', verifierToken, (req, res) => {
   res.json({ message: 'Photo supprimée' });
 });
 
-app.post('/contact', async (req, res) => {
+app.post('/contact', uploadSansFichier.none(), async (req, res) => {
   const { prenom, nom, email, sujet, message } = req.body;
 
   if (!prenom || !nom || !email || !sujet || !message) {
