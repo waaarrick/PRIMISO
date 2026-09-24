@@ -1,3 +1,4 @@
+const nodemailer = require('nodemailer');
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
@@ -134,6 +135,42 @@ app.delete('/chantiers/:id', verifierToken, (req, res) => {
 app.delete('/photos/:id', verifierToken, (req, res) => {
   db.prepare('DELETE FROM photos WHERE id = ?').run(req.params.id);
   res.json({ message: 'Photo supprimée' });
+});
+
+app.post('/contact', async (req, res) => {
+  const { prenom, nom, email, sujet, message } = req.body;
+
+  if (!prenom || !nom || !email || !sujet || !message) {
+    return res.status(400).json({ succes: false, erreur: 'Tous les champs sont obligatoires.' });
+  }
+
+  const emailValide = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if (!emailValide) {
+    return res.status(400).json({ succes: false, erreur: 'Email invalide.' });
+  }
+
+  try {
+    const transporteur = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASSWORD,
+      },
+    });
+
+    await transporteur.sendMail({
+      from: `"${prenom} ${nom}" <${process.env.SMTP_USER}>`,
+      to: 'contact@primiso.fr',
+      replyTo: email,
+      subject: `[Contact PRIMISO] ${sujet}`,
+      text: `De : ${prenom} ${nom} (${email})\n\n${message}`,
+    });
+
+    res.json({ succes: true });
+  } catch (erreur) {
+    console.error(erreur);
+    res.status(500).json({ succes: false, erreur: 'Erreur lors de l\'envoi.' });
+  }
 });
 
 app.listen(PORT, () => {
