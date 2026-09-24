@@ -1,4 +1,3 @@
-const nodemailer = require('nodemailer');
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
@@ -45,7 +44,6 @@ app.get('/chantiers/:id', (req, res) => {
   if (!chantier) {
     return res.status(404).json({ erreur: 'Chantier introuvable' });
   }
-  // Récupère aussi les photos liées à ce chantier
   const photos = db.prepare('SELECT * FROM photos WHERE chantier_id = ?').all(req.params.id);
   res.json({ ...chantier, photos });
 });
@@ -66,33 +64,24 @@ app.post('/auth/login', (req, res) => {
   res.json({ token });
 });
 
-// Construit une date ISO à partir d'une année saisie dans le formulaire admin.
-// Si aucune année n'est fournie, on retombe sur la date/heure actuelle.
 function construireDateCreation(annee) {
   const anneeValide = parseInt(annee, 10);
   if (!anneeValide || isNaN(anneeValide)) {
     return new Date().toISOString();
   }
-  // 1er juillet de l'année choisie, pour éviter les décalages de fuseau horaire
-  // qui feraient parfois basculer le 1er janvier sur l'année précédente à l'affichage.
   return new Date(Date.UTC(anneeValide, 6, 1)).toISOString();
 }
 
-// Route protégée : créer un nouveau chantier
-// "verifierToken" s'exécute avant la fonction principale, bloque si pas de token valide
-// "upload.array('photos', 10)" gère jusqu'à 10 photos envoyées sous le nom "photos"
 app.post('/chantiers', verifierToken, upload.array('photos', 10), (req, res) => {
   const { titre, description, prestations, annee } = req.body;
   const dateCreation = construireDateCreation(annee);
 
-  // Insère le nouveau chantier
   const resultat = db
     .prepare('INSERT INTO chantiers (titre, description, prestations, date_creation) VALUES (?, ?, ?, ?)')
     .run(titre, description, prestations, dateCreation);
 
   const chantierId = resultat.lastInsertRowid;
 
-  // Si des photos ont été envoyées, les enregistre en base liées à ce chantier
   if (req.files) {
     const insererPhoto = db.prepare('INSERT INTO photos (chantier_id, chemin) VALUES (?, ?)');
     req.files.forEach((file) => {
@@ -103,7 +92,6 @@ app.post('/chantiers', verifierToken, upload.array('photos', 10), (req, res) => 
   res.status(201).json({ id: chantierId, message: 'Chantier créé' });
 });
 
-// Route protégée : modifier un chantier existant
 app.put('/chantiers/:id', verifierToken, upload.array('photos', 10), (req, res) => {
   const { titre, description, prestations, annee } = req.body;
   const dateCreation = construireDateCreation(annee);
@@ -116,7 +104,6 @@ app.put('/chantiers/:id', verifierToken, upload.array('photos', 10), (req, res) 
     req.params.id
   );
 
-  // Ajoute les nouvelles photos envoyées (les anciennes restent, sauf suppression explicite)
   if (req.files) {
     const insererPhoto = db.prepare('INSERT INTO photos (chantier_id, chemin) VALUES (?, ?)');
     req.files.forEach((file) => {
@@ -127,14 +114,11 @@ app.put('/chantiers/:id', verifierToken, upload.array('photos', 10), (req, res) 
   res.json({ message: 'Chantier modifié' });
 });
 
-// Route protégée : supprimer un chantier
 app.delete('/chantiers/:id', verifierToken, (req, res) => {
   db.prepare('DELETE FROM chantiers WHERE id = ?').run(req.params.id);
-  // Les photos liées sont supprimées automatiquement grâce à "ON DELETE CASCADE" dans db.js
   res.json({ message: 'Chantier supprimé' });
 });
 
-// Route protégée : supprimer une seule photo (sans toucher au reste du chantier)
 app.delete('/photos/:id', verifierToken, (req, res) => {
   db.prepare('DELETE FROM photos WHERE id = ?').run(req.params.id);
   res.json({ message: 'Photo supprimée' });
@@ -153,23 +137,26 @@ app.post('/contact', uploadSansFichier.none(), async (req, res) => {
   }
 
   try {
-    const transporteur = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASSWORD,
+    const reponseResend = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        from: 'PRIMISO <onboarding@resend.dev>',
+        to: 'mansoibou.warrick@gmail.com',
+        reply_to: email,
+        subject: `[Contact PRIMISO] ${sujet}`,
+        text: `De : ${prenom} ${nom} (${email})\n\n${message}`,
+      }),
     });
 
-    await transporteur.sendMail({
-      from: `"${prenom} ${nom}" <${process.env.SMTP_USER}>`,
-      to: 'contact@primiso.fr',
-      replyTo: email,
-      subject: `[Contact PRIMISO] ${sujet}`,
-      text: `De : ${prenom} ${nom} (${email})\n\n${message}`,
-    });
+    if (!reponseResend.ok) {
+      const detail = await reponseResend.text();
+      console.error('Erreur Resend:', detail);
+      throw new Error('Echec envoi Resend');
+    }
 
     res.json({ succes: true });
   } catch (erreur) {
